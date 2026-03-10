@@ -373,7 +373,13 @@ with tab1:
 
 with tab2:
 
+    import streamlit as st
+    import pandas as pd
+
     st.subheader("Binary Logic Simulator")
+
+    if "logic_results" not in st.session_state:
+        st.session_state.logic_results = None
 
     col1, col2 = st.columns(2)
 
@@ -382,6 +388,7 @@ with tab2:
 
     with col2:
         b = st.text_input("Binary B", placeholder="Example: 1100")
+
 
     if st.button("Compute Logic"):
 
@@ -407,30 +414,49 @@ with tab2:
         NAND = bin(~(A & B) & ((1 << max_len)-1))[2:].zfill(max_len)
         NOR = bin(~(A | B) & ((1 << max_len)-1))[2:].zfill(max_len)
 
+        st.session_state.logic_results = {
+            "a": a,
+            "b": b,
+            "AND": AND,
+            "OR": OR,
+            "XOR": XOR,
+            "NAND": NAND,
+            "NOR": NOR,
+            "max_len": max_len
+        }
+
+
+    # tampilkan hasil jika sudah ada
+    if st.session_state.logic_results:
+
+        r = st.session_state.logic_results
+
         st.subheader("Logic Results")
 
         df = pd.DataFrame({
             "Operation": ["AND", "OR", "XOR", "NAND", "NOR"],
-            "Result": [AND, OR, XOR, NAND, NOR]
+            "Result": [r["AND"], r["OR"], r["XOR"], r["NAND"], r["NOR"]]
         })
 
         st.dataframe(df, use_container_width=True, hide_index=True)
 
+
         st.subheader("Bitwise Visualization")
 
-        st.write("A:", a)
-        st.write("B:", b)
-        st.write("AND:", AND)
-        st.write("OR:", OR)
-        st.write("XOR:", XOR)
+        st.write("A:", r["a"])
+        st.write("B:", r["b"])
+        st.write("AND:", r["AND"])
+        st.write("OR:", r["OR"])
+        st.write("XOR:", r["XOR"])
+
 
         st.subheader("Binary Grid")
 
-        cols = st.columns(max_len)
+        cols = st.columns(r["max_len"])
 
-        for i in range(max_len):
+        for i in range(r["max_len"]):
 
-            bit = AND[i]
+            bit = r["AND"][i]
 
             if bit == "1":
 
@@ -445,6 +471,8 @@ with tab2:
                     "<div style='background:#111;border:1px solid #00ff9f;padding:20px;text-align:center;border-radius:6px'>0</div>",
                     unsafe_allow_html=True
                 )
+
+
         st.subheader("Logic Truth Table")
 
         truth = pd.DataFrame({
@@ -456,7 +484,6 @@ with tab2:
         })
 
         st.dataframe(truth, use_container_width=True, hide_index=True)
-
 with tab3:
 
     st.subheader("Conversion Analytics Dashboard")
