@@ -373,7 +373,7 @@ with tab1:
 
 with tab2:
 
-    import streamlit as st
+    import streamlit as st          
     import pandas as pd
 
     st.subheader("Binary Logic Simulator")
